@@ -1,0 +1,40 @@
+services:
+  frontend:
+    build: ./frontend
+    container_name: frontend_diego_azurdia_1010821
+    volumes:
+      - ./frontend:/app # Sincroniza código para Hot Reload
+      - /app/node_modules # Evita sobrescribir módulos internos
+    ports:
+      - "5173:5173" 
+    networks:
+      - proyecto_net
+
+  backend:
+    build: ./backend
+    container_name: backend_diego_azurdia_1010821
+    env_file: .env
+    ports:
+      - "5000:5000"
+    networks:
+      - proyecto_net
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo_diego_azurdia_1010821
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASS}
+    volumes:
+      - db_data:/data/db
+    networks:
+      - proyecto_net
+
+networks:
+  proyecto_net:
+    driver: bridge
+
+volumes:
+  db_data:
